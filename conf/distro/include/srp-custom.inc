@@ -1,0 +1,27 @@
+YOCTO_ALTERNATIVE_KERNELS ?= "\
+${@oe.utils.conditional('PREFERRED_PROVIDER_virtual/kernel',\
+	'linux-yocto', '',    ' linux-yocto', d)}\
+${@oe.utils.conditional('PREFERRED_PROVIDER_virtual/kernel',\
+	'linux-yocto-debug', '',    ' linux-yocto-debug', d)}\
+"
+
+LOCAL_ALTERNATIVE_KERNELS ?= ""
+
+ALTERNATIVE_KERNELS ?= \
+"${${@''.join(d.getVar('PREFERRED_PROVIDER_virtual/kernel').upper()\
+	.split('-')[1:2])}_ALTERNATIVE_KERNELS}"
+
+ALTERNATIVE_KERNELS_INSTALL ?= \
+"${@d.getVar('ALTERNATIVE_KERNELS').replace('linux-','altkernel-linux-')}"
+
+ALTERNATIVE_KERNELS_MODULES_INSTALL ?= \
+"${@'-modules '.join(d.getVar('ALTERNATIVE_KERNELS_INSTALL')[1:].split(' '))}-modules"
+
+ALTERNATIVE_KERNELS_CLEAN_TASK = \
+"${@':do_clean '.join(d.getVar('ALTERNATIVE_KERNELS')[1:].split(' '))}:do_clean"
+ALTERNATIVE_KERNELS_CLEANSSTATE_TASK = \
+"${@':do_cleansstate '.join(d.getVar('ALTERNATIVE_KERNELS')[1:].split(' '))}:do_cleansstate"
+ALTERNATIVE_KERNELS_CLEAN = \
+"${@oe.utils.conditional('ALTERNATIVE_KERNELS', '', '', '${ALTERNATIVE_KERNELS_CLEAN_TASK}', d)}"
+ALTERNATIVE_KERNELS_CLEANSSTATE = \
+"${@oe.utils.conditional('ALTERNATIVE_KERNELS', '', '', '${ALTERNATIVE_KERNELS_CLEANSSTATE_TASK}', d)}"

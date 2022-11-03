@@ -1,0 +1,428 @@
+meta-intel-srp
+==============
+
+This is the OpenEmbedded/Yocto BSP layer for Intel's Soft Radio Project.
+
+
+Supported MACHINES
+==================
+
+- srpeh (Soft Radio Project - External Host) - This BSP is optimized 
+  for Intel HWC (Hawk Crest) Simulator
+
+Please refer to the associate .conf for more information.
+
+
+Reference platforms
+===================
+
+- HWC (Hawk Crest) Simulator
+
+
+Dependencies
+============
+
+For a complete list of dependent layers, please check DEPENDENCIES.
+
+
+Table of Contents
+=================
+
+  I. Prerequisites
+ II. Building meta-intel-srp
+     1. Clone OpenEmbedded/Yocto layers
+     2. Prepare and customize the build
+     3. Select the image type and start the build
+     4. Build and install the SDK
+     5. Read-only rootfs with writable overlayfs
+III. Guidelines for submitting patches
+ IV. Maintenance
+  V. License
+
+
+I. Prerequisites
+================
+
+To begin using the Yocto Project build tools, you must first setup your
+work environment and verify that you have the required host packages
+installed on the system you will be using for builds. 
+
+Check the YOCTO Reference Manual for the system you are using and verify
+you have the minimum required packages installed:
+http://www.yoctoproject.org/docs/current/ref-manual/ref-manual.html
+
+Create an empty directory and verify that the partition has at least
+50Gb of free space. Next set an environment variable, YOCTO, to the
+full path.
+
+   $ cd $HOME
+   $ df -h .  # verify output shows adequate space available
+   $ mkdir yocto
+   $ cd yocto
+   $ export YOCTO=$HOME/yocto # should also add to your ~/.bashrc file.
+
+
+II. Building meta-intel-srp
+===========================
+
+1. Clone OpenEmbedded/Yocto layers
+----------------------------------
+
+1.1 Clone the Intel Soft Radio Project repository.
+
+   $ cd $YOCTO
+   $ git clone https://github.com/intel-innersource/networking.wireless.radio.softradio-yocto.git \
+               meta-intel-srp
+   $ cd meta-intel-srp
+   
+   If using the 'dunfell' branch.
+
+   If using the 'kirkstone' branch.
+
+   $ git checkout kirkstone
+
+   If using the tag specified in the releases notes.
+
+   $ git checkout tags/(the tag specified in the releases notes)
+
+1.2 Clone the Yocto Project build tools (Poky) environment.
+
+   $ cd $YOCTO
+   $ git clone git://git.yoctoproject.org/poky.git
+   $ cd poky
+   $ git checkout <the revision specified in DEPENDENCIES>
+
+1.3 The Open Embedded project provides many useful layers and packages
+   such as networking. Download the Open Embedded Yocto Project hosted
+   repository with the following.
+
+   $ cd $YOCTO
+   $ git clone https://github.com/openembedded/meta-openembedded.git
+   $ cd meta-openembedded
+   $ git checkout <the revision specified in DEPENDENCIES>
+
+
+2. Prepare and customize the build
+----------------------------------
+
+2.1 Create the build directory. The name is optional and will default
+   to 'build', however it helps to choose a name to match the board
+   type. For example, we will use srp-build.
+
+   $ cd $YOCTO
+   $ source meta-intel-srp/srp-env
+   $ source poky/oe-init-build-env srp-build
+
+2.2 Check the conf/bblayers.conf file and edit if necessary.
+
+   $ pwd (you should be at $YOCTO/srp-build)
+   $ vi conf/bblayers.conf
+
+BBLAYERS variable should have the following content (references to YOCTO
+below shoud be replaced with the actual value you provided prior).
+
+   BBLAYERS ?= " \
+            $YOCTO/poky/meta \
+            $YOCTO/poky/meta-poky \
+            $YOCTO/poky/meta-yocto-bsp \
+            $YOCTO/meta-openembedded/meta-oe \
+            $YOCTO/meta-openembedded/meta-filesystems \
+            $YOCTO/meta-intel-srp \
+            "
+
+2.3 Check the conf/local.conf file and edit if necessary.
+
+   $ vi conf/local.conf
+
+2.3.1 Set distribution configuration to have all SRP specific features.
+
+    DISTRO = "intel-srp"
+
+2.3.2 Set Release version. Replace it with the release tag for meta-intel-srp.
+
+    RELEASE_VERSION = "(meta-intel-srp-tag)"
+
+2.3.3 Select the specific machine to target the build with:
+
+  MACHINE = "srpeh"
+
+2.3.4 Select the main kernel to use (virtual/kernel provider).
+     You can build the kernel from 2 sources:
+
+a. Yocto Project Source repositories (git.yoctoproject.org)
+
+   PREFERRED_PROVIDER_virtual/kernel = "linux-yocto"
+
+   will build from Yocto repos:
+   5.15: git://git.yoctoproject.org/linux-yocto.git
+         v5.15/standard/base branch
+
+b. Local Kernel repositories (for Linux development)
+
+   If you want to base a Yocto build on a local Linux kernel, do the
+   following. First, make the following changes to local.conf.
+
+   PREFERRED_PROVIDER_virtual/kernel = "linux-local"
+   LOCAL_KERNEL_PATH = "<path to local Linux repository>"
+   LOCAL_KERNEL_BRANCH = "<branch in the repository>"
+
+   Then, in the meta-intel-srp layer, add a Linux configuration file
+   next to linux.local.bb recipe. Copy a full configuration to
+   meta-intel-srp/recipes-kernel/linux/defconfig.
+
+   NOTE: All changes must be committed in the local kernel, as the
+         build will clone it using git.
+
+2.3.5 Select the version for the main kernel:
+
+   PREFERRED_VERSION_linux-yocto= "5.15%"
+
+NOTE: No preferred version should be set for linux-local provider.
+
+2.3.6 Build multiple versions of the kernel in one build
+
+   By default, with intel-axxia distro, 2 versions of kernel are built
+   in one build: linux-intel and linux-intel-debug (the debug version).
+   
+   The kernel which is set as virtual/kernel provider will be installed
+   as usual in the deploy directory of the build. Alternative kernels
+   with their modules will be installed in deploy directory under 
+   separate folders having the following template name: kernel-<PN>. 
+   
+   Alternative kernels will be also installed in rootfs /boot directory
+   and the modules for all kernels in /lib/modules/<KENREL_VERSION>.
+   Kernels can be swhitch by recreating the bzImage symlink in /boot.
+   Default is the kernel set as preferred provider for virtual/kernel.
+
+   If don't want to build alternative kernels, just reset the following
+   variable in local.conf:
+
+   ALTERNATIVE_KERNELS = ""
+
+2.3.7. Enable "multilib" support if desired.
+
+    DISTRO_FEATURES:append = " multilib"
+
+2.3.8. Add simics support (for large and sim images). This will install
+    simicsfs-client and simics-agent in rootfs. If enabled, it's mandatory
+    to set the SIMICS version.
+
+    DISTRO_FEATURES:append = " simics"
+    SIMICS_VERSION = "<simics-version>"
+
+    Sources tgz archive should be copied in meta-intel-distro/downloads
+    directory: simics-<simics-version>.tgz and should match the version
+    set in SIMICS_VERSION.
+
+    To generate simics-<simics-version>.tgz, get "ase_jvl_external*.txz" from
+    the SW download page (VIP), and do the following.
+
+    * tar xf ase_jvl_external*.txz
+    * 'cd ase/simics'
+    * tar czf simics-<simics-version>.tgz simics-<simics-version>
+
+2.3.9 Depending on your processor, set these two options that control
+    how much parallelism BitBake should use:
+
+  BB_NUMBER_THREADS = "12"
+  PARALLEL_MAKE = "-j 12"
+
+2.3.10 Other optional settings for saving disk space and build time:
+   
+   DL_DIR = "/(some-shared-location)/downloads"
+   SSTATE_DIR = "/(some-shared-location)/sstate-cache
+
+2.3.11 Examples
+
+     See http://www.yoctoproject.org/docs/2.3/mega-manual/mega-manual.html
+     for complete documentation on the Yocto build system.
+
+     Here are the local.conf files used for open builds:
+
+MACHINE = "srpeh"
+PREFERRED_PROVIDER_virtual/kernel = "linux-yocto"
+PREFERRED_VERSION_linux-yocto = "5.15%"
+DISTRO = "intel-srp"
+PACKAGE_CLASSES ?= "package_rpm"
+EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
+USER_CLASSES ?= "buildstats"
+PATCHRESOLVE = "noop"
+BB_DISKMON_DIRS ??= "\
+    STOPTASKS,${TMPDIR},1G,100K \
+    STOPTASKS,${DL_DIR},1G,100K \
+    STOPTASKS,${SSTATE_DIR},1G,100K \
+    STOPTASKS,/tmp,100M,100K \
+    HALT,${TMPDIR},100M,1K \
+    HALT,${DL_DIR},100M,1K \
+    HALT,${SSTATE_DIR},100M,1K \
+    HALT,/tmp,10M,1K"
+PACKAGECONFIG:append:pn-qemu-system-native = " sdl"
+CONF_VERSION = "2"
+
+
+3. Select the image type and start the build
+--------------------------------------------
+
+   $ cd $YOCTO/srp-build
+   $ bitbake (image type)
+
+Available root filesystem types:
+   * srp-image-run
+     A console-only image with full-featured Linux system
+     functionality installed.
+
+   * srp-image-dev
+     A development image with more full-featured Linux system
+     functionality installed, including LTP test suite.
+
+Once complete the images for the target machine will be available in the
+output directory 'tmp/deploy/images/$MACHINE'.
+
+3.1 Images generated:
+
+* (image type)-(machine name).tar.gz (rootfs in tar+GZIP format)
+* (image type)-(machine name).wic (rootfs in wic format)
+* modules-(machine name).tgz (modules in tar+GZIP format)
+* bzImage and bzImage-(machine name) (Linux Kernel binary)
+
+
+4. Build and install the SDK
+----------------------------
+
+Run 'populate_sdk' task for srp-image-dev image to build
+the SDK.
+
+    $ bitbake srp-image-dev -c populate_sdk
+
+It will install a self extracting script in tmp/deploy/sdk. Simply run
+the poky*.sh script. To set up the environment to use the tools, source
+environment-setup* in the install directory.
+
+After the installation completes, do the following:
+
+4.1 Optional Linux Module Tools Update
+
+If external Linux modules need to be buildable after installing the
+SDK, the Linux kernel sources need to be updated as follows, using the
+external-modules-setup.sh script which is deployed with the SDK.
+
+source (install directory)/environment-setup*
+./(install directory)/external-modules-setup.sh
+
+The SDK should contain all you need to run the above. In case the Linux
+build fails because of missing packages on the host, be sure you have
+the following installed: libncurses5-dev flex bison libssl-dev dkms
+libelf-dev (for Ubuntu).
+
+
+5. Read-only rootfs with writable overlayfs
+-------------------------------------------
+
+Having a read-only root file system is useful for many scenarios:
+* Separate user specific changes from system configuration
+* Allow factory reset, by deleting the user specific changes
+* Have a fallback image in case the user specific changes made the root
+  file system no longer bootable
+* Share root file system to boot multiple boards via NFS
+
+Because some data on the root file system changes on first boot or
+while the system is running, just mounting the complete root file
+system as read-only breaks many applications.
+
+Instead of having a read-only root files system and symlinking/bind
+mounting files and directories that could potentially change while the
+system is running to a writable partition, mounting a writable overlay
+root file system, that uses a read-only file system as its base and
+writes changed data to another writable partition.
+
+Here no investigation of writable files are needed and factory reset
+can be done by just deleting all files or formatting the writable
+volume. In case when upperdir of the overlay is mounted as tmpfs, all
+the changes will be reset on reboot.
+
+In order to boot the rootfs read-only with writable overlayfs, set the
+custom init-readonly-overlay script as init script for boot with the
+following Kernel command line parameter:
+
+    init=/init-readonly-overlay
+
+This will mount the rootfs read-only in /media/rfs/ro, a tmpfs
+mountpoint will be created in /media/rfs/rw and an overlayfs will be
+mounted on root / directory using the readonly rootfs as lowerdir and
+the tmpfs one as upperdir. All the user specific changes will be stored
+in tmpfs, so will be volative.
+
+For persistent user changes, a new read-write device/partition need to
+be present and set with the following Kernel command line parameter:
+
+    rootrw=/dev/sda1
+    
+The lower filesystem can be any filesystem supported by Linux and does
+not need to be writable. But, since the upper filesystem will normally
+be writable, it must support the creation of trusted.* extended
+attributes, and must provide valid d_type in readdir responses, so NFS
+is not suitable.
+
+Other Kernel command line parameters:
+root= specifies the read-only root file system device. If this is not 
+      specified, the current rootfs is used.
+
+rootfstype= if support for the read-only file system is not build into
+            the kernel, you can specify the required module name here.
+            It will also be used in the mount command.
+
+rootoptions= specifies the mount options of the read-only file system. 
+             Defaults to noatime,nodiratime.
+
+rootinit= if the init parameter was set to init-readonly-overlay script,
+          rootinit can be used to overwrite the default (/sbin/init).
+          E.g. rootinit=/bin/sh
+
+rootrw= specifies the read-write file system device. If this is not
+        specified, tmpfs is used.
+
+rootrwfstype= if support for the read-write file system is not build
+              into the kernel, you can specify the required module name
+              here. It will also be used in the mount command.
+
+rootrwoptions= specifies the mount options of the read-write file
+               system. Defaults to rw,noatime.
+
+rootrwreset= set to yes if you want to delete all the files in the
+             read-write file system prior to building the overlay root
+             files system.
+
+More details on how to setup a writable root file system overlay on
+top of a read-only root file system can be found in
+meta-readonly-rootfs-overlay layer [1], and details about overlays can
+be found in the Kernel official documentation [2].
+
+1. https://github.com/cmhe/meta-readonly-rootfs-overlay
+2. https://www.kernel.org/doc/Documentation/filesystems/overlayfs.txt
+
+
+III. Guidelines for submitting patches
+======================================
+
+Please submit any patches against meta-intel-srp BSPs to the maintainers
+specified in MAINTAINERS.
+
+When creating patches, please use something like:
+	git format-patch -s --subject-prefix='meta-intel-srp][PATCH' origin
+
+
+IV. Maintenance
+===============
+
+Maintainers: John Jacques (john.jacques@intel.com)
+             Daniel Dragomir (daniel.dragomir@windriver.com)
+
+Please see the meta-intel-srp/MAINTAINERS file for more details.
+
+
+V. License
+==========
+
+All metadata is MIT licensed unless otherwise stated. Souce code included
+in tree for individual recipes is under the LICENSE stated in each recipe
+(.bb file) unless otherwise stated.

@@ -1,0 +1,40 @@
+MACHINE = "srpeh"
+
+# Release version should be the released tag for meta-intel-srp
+# RELEASE_VERSION = ""
+
+# Add simics support (sources should be in meta-intel-srp/download)
+# and set simics version to compile (mandatory).
+#DISTRO_FEATURES:append = " simics"
+#SIMICS_VERSION = ""
+
+# Enable "multilib"
+#DISTRO_FEATURES:append = " multilib"
+
+BB_NUMBER_THREADS ?= "${@oe.utils.cpu_count()}"
+PARALLEL_MAKE ?= "-j ${@oe.utils.cpu_count()}"
+
+# Assume directories were created under TOPDIR
+#DL_DIR ?= "${TOPDIR}/downloads"
+#SSTATE_DIR ?= "${TOPDIR}/sstate-cache"
+#TMPDIR = "${TOPDIR}/tmp"
+
+DISTRO = "intel-srp"
+PACKAGE_CLASSES ?= "package_rpm"
+EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
+USER_CLASSES ?= "buildstats"
+PATCHRESOLVE = "noop"
+BB_DISKMON_DIRS ??= "\
+    STOPTASKS,${TMPDIR},1G,100K \
+    STOPTASKS,${DL_DIR},1G,100K \
+    STOPTASKS,${SSTATE_DIR},1G,100K \
+    STOPTASKS,/tmp,100M,100K \
+    HALT,${TMPDIR},100M,1K \
+    HALT,${DL_DIR},100M,1K \
+    HALT,${SSTATE_DIR},100M,1K \
+    HALT,/tmp,10M,1K"
+PACKAGECONFIG:append:pn-qemu-system-native = " sdl"
+CONF_VERSION = "2"
+
+# For more options check meta-intel-srp layer for README and 
+# poky/meta-poky/conf/local.conf.sample.extended
