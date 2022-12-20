@@ -17,6 +17,11 @@ kexec \
 kexec-tools \
 srp-rc-local \
 libxml2 \
+python3-core \
+python3-pip \
+python3-pytest \
+${@bb.utils.contains('DISTRO_FEATURES', 'simics', \
+		     'simicsfs-client simics-agent fuse', '', d)} \
 "
 
 inherit core-image

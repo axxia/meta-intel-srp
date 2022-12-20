@@ -31,13 +31,11 @@ libubsan \
 libxml2 \
 libxml2-dev \
 pciutils \
-${@oe.utils.conditional('ALTERNATIVE_KERNELS', '', '', ' \
-			${ALTERNATIVE_KERNELS_INSTALL} \
-			${ALTERNATIVE_KERNELS_MODULES_INSTALL}', d)} \
+python3-core \
+python3-pip \
+python3-pytest \
 ${@bb.utils.contains('DISTRO_FEATURES', 'simics', \
 		     'simicsfs-client simics-agent fuse', '', d)} \
-${@bb.utils.contains('DISTRO_FEATURES', 'multilib', \
-		     '${MULTILIB_PACKAGES}', '', d)}  \
 "
 
 MULTILIB_PACKAGES ?= " \
