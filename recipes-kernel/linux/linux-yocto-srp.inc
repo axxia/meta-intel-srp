@@ -1,8 +1,8 @@
-KBRANCH:srpeh  = "v5.15/standard/base"
+KBRANCH:srpeh  = "v6.1/standard/base"
 KMACHINE:srpeh = "common-pc-64"
-SRCREV_machine:srpeh ?= "efe20512212b0e85b5f884b1bfc8fbba2b43541a"
+SRCREV_machine:srpeh ?= "9b52a4e842fde2fc6d7bfc163c90ffe0b4af9cc9"
 COMPATIBLE_MACHINE:srpeh = "srpeh"
-LINUX_VERSION:srpeh = "5.15.59"
+LINUX_VERSION:srpeh = "6.1.62"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}:${THISDIR}/patches:${THISDIR}/frags:"
 
