@@ -75,11 +75,9 @@ II. Building meta-intel-srp
                meta-intel-srp
    $ cd meta-intel-srp
    
-   If using the 'dunfell' branch.
+   If using the 'scarthgap' branch.
 
-   If using the 'kirkstone' branch.
-
-   $ git checkout kirkstone
+   $ git checkout scarthgap
 
    If using the tag specified in the releases notes.
 
