@@ -26,6 +26,8 @@ srp-rc-local \
 kernel-dev \
 kernel-devsrc \
 libasan \
+libb64 \
+libb64-dev \
 libgcc \
 libubsan \
 libxml2 \
