@@ -1,8 +1,12 @@
 DESCRIPTION = "A development image with more full-featured Linux system \
 functionality installed, including LTP test suite."
 
-GLIBC_GENERATE_LOCALES = "en_GB.UTF-8 en_US.UTF-8"
-IMAGE_LINGUAS ?= "en-gb"
+GLIBC_GENERATE_LOCALES = "en_US.UTF-8"
+IMAGE_LINGUAS = "en-us"
+
+APPEND = "console=ttyS0 loglevel=8"
+
+AUTO_SYSLINUXMENU = "0"
 
 IMAGE_FEATURES:append = " \
 dev-pkgs \
