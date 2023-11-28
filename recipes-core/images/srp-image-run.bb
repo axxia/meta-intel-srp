@@ -16,8 +16,10 @@ initscripts-readonly-rootfs-overlay \
 kexec \
 kexec-tools \
 srp-rc-local \
+libb64 \
 libxml2 \
 python3-core \
+python3-pexpect \
 python3-pip \
 python3-pytest \
 ${@bb.utils.contains('DISTRO_FEATURES', 'simics', \

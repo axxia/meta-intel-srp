@@ -38,6 +38,7 @@ libxml2 \
 libxml2-dev \
 pciutils \
 python3-core \
+python3-pexpect \
 python3-pip \
 python3-pytest \
 ${@bb.utils.contains('DISTRO_FEATURES', 'simics', \
