@@ -5,10 +5,10 @@ Poky
 ----
 URI: https://git.yoctoproject.org/poky
 branch: master
-revision: cdecc1f6056a9f4ff15c6af91c15262172d04b57
+revision: b5624ee5643d881afa004571a096a189ab5389b5
 
 OpenEmbedded
 ------------
 URI: https://git.openembedded.org/meta-openembedded
 branch: master
-revision: 3029554ceb0b0bb52a8d8ec3f0a75c5113662fe6
+revision: a0237019f5b5c003fd0c6fd4486859214e24be01
