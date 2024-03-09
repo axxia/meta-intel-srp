@@ -152,8 +152,8 @@ a. Yocto Project Source repositories (git.yoctoproject.org)
    PREFERRED_PROVIDER_virtual/kernel = "linux-yocto"
 
    will build from Yocto repos:
-   6.1: git://git.yoctoproject.org/linux-yocto.git
-        v6.1/standard/base branch
+   6.6: git://git.yoctoproject.org/linux-yocto.git
+        v6.6/standard/base branch
 
 b. Local Kernel repositories (for Linux development)
 
@@ -173,7 +173,7 @@ b. Local Kernel repositories (for Linux development)
 
 2.3.5 Select the version for the main kernel:
 
-   PREFERRED_VERSION_linux-yocto= "6.1%"
+   PREFERRED_VERSION_linux-yocto= "6.666666%"
 
 NOTE: No preferred version should be set for linux-local provider.
 
@@ -239,7 +239,7 @@ NOTE: No preferred version should be set for linux-local provider.
 
 MACHINE = "srpeh"
 PREFERRED_PROVIDER_virtual/kernel = "linux-yocto"
-PREFERRED_VERSION_linux-yocto = "6.1%"
+PREFERRED_VERSION_linux-yocto = "6.6%"
 DISTRO = "intel-srp"
 PACKAGE_CLASSES ?= "package_rpm"
 EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
