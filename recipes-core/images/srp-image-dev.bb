@@ -8,6 +8,8 @@ APPEND = "console=ttyS0 loglevel=8"
 
 AUTO_SYSLINUXMENU = "0"
 
+require axxia-devsrc.inc
+
 IMAGE_FEATURES:append = " \
 dev-pkgs \
 splash \
@@ -28,7 +30,6 @@ kexec-tools \
 ltp \
 srp-rc-local \
 kernel-dev \
-kernel-devsrc \
 libasan \
 libb64 \
 libb64-dev \
