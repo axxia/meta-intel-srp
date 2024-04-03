@@ -42,6 +42,8 @@ python3-core \
 python3-pexpect \
 python3-pip \
 python3-pytest \
+screen \
+tmux \
 ${@bb.utils.contains('DISTRO_FEATURES', 'simics', \
 		     'simicsfs-client simics-agent fuse', '', d)} \
 "
