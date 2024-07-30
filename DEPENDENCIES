@@ -4,11 +4,11 @@ Dependencies
 Poky
 ----
 URI: https://git.yoctoproject.org/poky
-branch: master
-revision: b5624ee5643d881afa004571a096a189ab5389b5
+branch: scarthgap
+revision: 6879650b927c96a2464224cdc2bed8245511cb
 
 OpenEmbedded
 ------------
 URI: https://git.openembedded.org/meta-openembedded
-branch: master
-revision: a0237019f5b5c003fd0c6fd4486859214e24be01
+branch: scarthgap
+revision: 80e01188fa822d87d301ee71973c462d7a8654
