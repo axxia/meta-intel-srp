@@ -4,8 +4,6 @@ functionality installed, including LTP test suite."
 GLIBC_GENERATE_LOCALES = "en_US.UTF-8"
 IMAGE_LINGUAS = "en-us"
 
-APPEND = "console=ttyS0 loglevel=8"
-
 AUTO_SYSLINUXMENU = "0"
 
 require axxia-devsrc.inc
